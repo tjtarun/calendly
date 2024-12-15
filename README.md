@@ -116,7 +116,6 @@
 - Extra meta data in user_slot/meeting - Description/Title of meeting etc.
 - Default recurring date ranges is 1 year to be made editable for user
 - Authentication - UserToken table etc.
-- UserSlot API can be made better as more actions comes in
 - schedule can have specific settings with it - meta data
 - user_event_type can have specific settings and checks - meta data
 - Sentry - Error - Monitoring tool setup
