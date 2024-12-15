@@ -138,9 +138,8 @@ https://calendly-2gn5.onrender.com
 
 ## API Design
 
-Published Documentation: https://documenter.getpostman.com/view/368207/2sAYHzF39Y
-Postman
-workspace: https://web.postman.co/workspace/d0ec556f-97e7-41c7-91cf-cefb5ac8b992/documentation/368207-6fafde33-dcac-4cef-9cc0-74611aeb1a67
+- Published Documentation: https://documenter.getpostman.com/view/368207/2sAYHzF39Y
+- Postman workspace: https://web.postman.co/workspace/d0ec556f-97e7-41c7-91cf-cefb5ac8b992/documentation/368207-6fafde33-dcac-4cef-9cc0-74611aeb1a67
 
 ### What is supported?
 
