@@ -1,5 +1,6 @@
 import datetime
 
+from app.managers import UserRecurringSlotManager
 from app.models import UserSlot, UserSlotGuest, UserEventType, UserRecurringSlot
 from app.models.user_schedule import UserSchedule
 
@@ -50,12 +51,12 @@ class UserSlotManager:
 
         user_slots = cls.create_user_slots(host_user_id, user_slots=[user_slot])
         cls.execute_add_guest(
-            user_slot_id=str(user_slots[0]["id"]),
+            user_slot_id=str(user_slots[0].id),
             guest_user_id=host_user_id,
             guest_user_role="HOST",
         )
         cls.execute_add_guest(
-            user_slot_id=str(user_slots[0]["id"]),
+            user_slot_id=str(user_slots[0].id),
             guest_user_id=request_user_id,
             guest_user_role="GUEST",
         )
@@ -104,7 +105,7 @@ class UserSlotManager:
         #     meeting_date,
         #     str(meeting_day),
         #     meeting_time_start,
-        #     meeting_time_end,
+        #     meeting_time_end
         # )
         if host_recurring_available_slots:
             return True
@@ -116,8 +117,8 @@ class UserSlotManager:
     ):
         schedule_id = str(schedule.id)
 
-        start_datetime = user_slot["start_datetime"]
-        duration = user_slot["duration"]
+        start_datetime = user_slot.start_datetime
+        duration = user_slot.duration
         start_datetime_obj = datetime.datetime.fromtimestamp(start_datetime)
         end_datetime_obj = start_datetime_obj + datetime.timedelta(minutes=duration)
         #
@@ -173,3 +174,92 @@ class UserSlotManager:
             guest_user_id=guest_user_id,
             guest_user_role=guest_user_role,
         )
+
+    @classmethod
+    def get_overlapping_availability_for_the_given_range(
+        cls, host_user_id, request_user_id, start_datetime, end_datetime
+    ):
+        # duplicate queries can be optimised.
+        # have assumed for now, that all recurring slots are available
+        # have assumed for now, all user slots are for available
+        # ie., not looking for any busy slot for this particular API
+        # also not looking for any day specific slots too.
+
+        host_user_recurring_slots = (
+            UserRecurringSlot.filter_by_user_id(user_id=host_user_id)
+            .order_by(UserRecurringSlot.start_time.asc())
+            .all()
+        )
+
+        request_user_recurring_slots = (
+            UserRecurringSlot.filter_by_user_id(user_id=request_user_id)
+            .order_by(UserRecurringSlot.start_time.asc())
+            .all()
+        )
+
+        # Filter and convert slots into datetime intervals
+        start_obj = datetime.datetime.fromtimestamp(start_datetime)
+        end_obj = datetime.datetime.fromtimestamp(end_datetime)
+        host_intervals = cls._generate_datetime_intervals(
+            host_user_recurring_slots, start_obj, end_obj
+        )
+        request_intervals = cls._generate_datetime_intervals(
+            request_user_recurring_slots, start_obj, end_obj
+        )
+
+        # Find overlapping intervals
+        overlapping_slots = cls._find_overlapping_intervals(
+            host_intervals, request_intervals
+        )
+
+        return overlapping_slots
+
+    @staticmethod
+    def _generate_datetime_intervals(recurring_slots, range_start, range_end):
+        intervals = []
+        for slot in recurring_slots:
+            if slot.slot_type != UserRecurringSlot.SlotType.AVAILABLE:
+                continue
+
+            current_date = max(range_start.date(), slot.recurring_start_date.date())
+            end_date = min(range_end.date(), slot.recurring_end_date.date())
+
+            while current_date <= end_date:
+                if current_date.weekday() == int(slot.day):
+                    start_dt = datetime.datetime.combine(current_date, slot.start_time)
+                    end_dt = datetime.datetime.combine(current_date, slot.end_time)
+
+                    # Ensure interval fits within the range
+                    if start_dt < range_start:
+                        start_dt = range_start
+                    if end_dt > range_end:
+                        end_dt = range_end
+
+                    if start_dt < end_dt:
+                        intervals.append((start_dt, end_dt))
+
+                current_date += datetime.timedelta(days=1)
+        return intervals
+
+    @staticmethod
+    def _find_overlapping_intervals(intervals1, intervals2):
+        overlapping = []
+        i, j = 0, 0
+        while i < len(intervals1) and j < len(intervals2):
+            start1, end1 = intervals1[i]
+            start2, end2 = intervals2[j]
+
+            # Find the overlap between two intervals
+            overlap_start = max(start1, start2)
+            overlap_end = min(end1, end2)
+
+            if overlap_start < overlap_end:
+                overlapping.append((overlap_start, overlap_end))
+
+            # Move to the next interval
+            if end1 < end2:
+                i += 1
+            else:
+                j += 1
+
+        return overlapping

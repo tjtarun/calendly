@@ -84,4 +84,4 @@ class UserRecurringSlot(BaseModelMixin):
 
     @classmethod
     def filter_by_user_id(cls, user_id):
-        return cls.query.filter(cls.user_id == user_id).all()
+        return cls.query.filter(cls.user_id == user_id)

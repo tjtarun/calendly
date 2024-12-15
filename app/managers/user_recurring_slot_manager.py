@@ -18,7 +18,7 @@ class UserRecurringSlotManager:
 
     @staticmethod
     def get_user_recurring_slots(user_id):
-        user_slots = UserRecurringSlot.filter_by_user_id(user_id=user_id)
+        user_slots = UserRecurringSlot.filter_by_user_id(user_id=user_id).all()
         return [user_slot.serialize() for user_slot in user_slots]
 
     @staticmethod

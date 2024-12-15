@@ -7,6 +7,38 @@ from app.models import UserSlot
 
 
 class MeetingsResource(BaseResourcesView):
+    get_request_parser = reqparse.RequestParser()
+
+    get_request_parser.add_argument(
+        "request_user_id", type=str, location="args", required=True
+    )
+    get_request_parser.add_argument(
+        "host_user_id", type=str, location="args", required=True
+    )
+    get_request_parser.add_argument("start_datetime", type=int, location="args")
+    get_request_parser.add_argument("end_datetime", type=int, location="args")
+
+    def get(self):
+        # overlapping available slots api.
+
+        kwargs = self.get_request_parser.parse_args()
+        host_user_id = kwargs.get("host_user_id")
+        request_user_id = kwargs.get("request_user_id")
+        start_datetime = kwargs.get("start_datetime")
+        end_datetime = kwargs.get("end_datetime")
+        try:
+            user_slots = (
+                UserSlotManager.get_overlapping_availability_for_the_given_range(
+                    host_user_id=host_user_id,
+                    request_user_id=request_user_id,
+                    start_datetime=start_datetime,
+                    end_datetime=end_datetime,
+                )
+            )
+        except ValueError as e:
+            raise HTTPBadRequest(str(e))
+        return dict(user_slots=user_slots)
+
     post_request_parser = reqparse.RequestParser()
 
     post_request_parser.add_argument(
