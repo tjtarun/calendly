@@ -1,0 +1,14 @@
+import logging
+
+APP_NAME = 'calendly'
+LOGGER_NAME = APP_NAME
+LOGGING_LEVEL = logging.INFO
+
+DEBUG = True
+TESTING = False
+PROPAGATE_EXCEPTIONS = True
+
+HOST_SERVER_URL = '0.0.0.0'
+HOST_SERVER_PORT = 80
+
+SECRET_KEY = 'SomeUniqueKey'

@@ -1,0 +1,29 @@
+FROM python:3.7-alpine
+RUN apk add --update tzdata
+ENV TZ=Asia/Calcutta
+ENV LANG C.UTF-8
+
+RUN \
+ pip install --no-cache-dir supervisor==4.1.0 && \
+ pip install --no-cache-dir --no-deps https://d138zd1ktt9iqe.cloudfront.net/static/pythonwheels/gevent-1.4.0-cp37-cp37m-linux_x86_64.whl \
+ https://d138zd1ktt9iqe.cloudfront.net/static/pythonwheels/greenlet-0.4.15-cp37-cp37m-linux_x86_64.whl && \
+ apk add --no-cache postgresql-libs bash pgbouncer gettext && \
+ apk add --no-cache --virtual .build-deps build-base gcc musl-dev postgresql-dev && \
+ pip install --no-cache-dir psycopg2==2.8.4 && \
+ mkdir -p /var/log/supervisor /etc/supervisor/conf.d/ && \
+ ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \
+ apk add --no-cache git
+
+#
+# RUN adduser --disabled-password postgres postgres
+# COPY supervisord.conf /etc/supervisor
+# RUN mkdir -p /config
+# COPY pgbouncer /config/pgbouncer
+# COPY base-entrypoint.sh /config/base-entrypoint.sh
+# COPY ot-init.py /config/ot-init.py
+
+# COPY requirements.txt /flask-req.txt
+# RUN pip install --no-cache-dir -r flask-req.txt
+
+# COPY setup/supervisor.conf /etc/supervisor/conf.d/
+# COPY prod_requirements.txt /requirements.txt
