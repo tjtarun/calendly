@@ -150,6 +150,8 @@ https://calendly-2gn5.onrender.com
 - Create user slot - date specific - availability
 - Create meeting
 - Added flask admin (without auth) for easy data viewing
+- Get user recurring slots with user slots - available/busy to view on calendar
+- Get two user calendar view to show all the overlapping available slots for a given range of calendar (not taking care of user slots)
 
 ### What is pending?
 
