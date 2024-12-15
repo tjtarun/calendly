@@ -124,6 +124,39 @@
 - Events can have pricing attached to it
 - Meetings to and fro - acceptance/reject etc.
 
+### API Sandbox
+
+https://calendly-2gn5.onrender.com
+
+### Running service locally
+
+- Install docker
+- Pull the image https://hub.docker.com/r/ainatarun/calendly
+- Run the image: `docker run -it -p 5001:80 -e DB_PASSWORD='shared_on_email' ainatarun/calendly:latest`
+- Open localhost:5001/calendly/admin in your browser
+- PostgreSQL has not been setup locally, since it's available for free on render.com
+
+## API Design
+
+Published Documentation: https://documenter.getpostman.com/view/368207/2sAYHzF39Y
+Postman
+workspace: https://web.postman.co/workspace/d0ec556f-97e7-41c7-91cf-cefb5ac8b992/documentation/368207-6fafde33-dcac-4cef-9cc0-74611aeb1a67
+
+### What is supported?
+
+- Create user
+- Create user schedule
+- Create user event type
+- Create user recurring slot - available/busy
+- Create user slot - date specific - availability
+- Create meeting
+- Added flask admin (without auth) for easy data viewing
+
+### What is pending?
+
+- Deep Testing, Basic testing has been done for conflict checking
+- Edge Cases may fail or may work too
+
 ## Database Design
 
 ### User
@@ -302,30 +335,3 @@ class UserSlotGuest(BaseModelMixin):
         "user_slot_id", UUID(as_uuid=True), nullable=False, index=True
     )
 ```
-
-## API Design
-Published Documentation: https://documenter.getpostman.com/view/368207/2sAYHzF39Y
-Postman workspace: https://web.postman.co/workspace/d0ec556f-97e7-41c7-91cf-cefb5ac8b992/documentation/368207-6fafde33-dcac-4cef-9cc0-74611aeb1a67
-
-## What is supported?
-- Create user
-- Create user schedule
-- Create user event type
-- Create user recurring slot - available/busy
-- Create user slot - date specific - availability
-- Create meeting
-- Added flask admin (without auth) for easy data viewing
-
-## What is pending?
-- Deep Testing, Basic testing has been done for conflict checking
-- Edge Cases may fail or may work too
-
-### API Sandbox
-https://calendly-2gn5.onrender.com
-
-### Running service locally
-- Install docker
-- Pull the image https://hub.docker.com/r/ainatarun/calendly
-- Run the image: `docker run -it -p 5001:80 -e DB_PASSWORD='shared_on_email' ainatarun/calendly:latest`
-- Open localhost:5001/calendly/admin in your browser
-- PostgreSQL has not been setup locally, since it's available for free on render.com
